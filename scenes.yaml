@@ -1,0 +1,20 @@
+# scenes.yaml — Scene sequence for the pipeline
+# Edit prompts freely. The LLM converts each to bpy Python code.
+
+scenes:
+  - name: scene_001_opening
+    prompt: >
+      Single glowing ember floating in total darkness. Volumetric fog around it.
+      Enable EEVEE bloom. Camera slowly zooms in over 72 frames (3 seconds at 24fps).
+
+  - name: scene_002_asteroid_field
+    prompt: >
+      Deep space asteroid field: 40 irregularly shaped rocks in a spherical
+      volume (radius 20m). Procedural dark gray rough material on each rock.
+      Starfield HDRI background. Camera dolly left-to-right over 96 frames.
+
+  - name: scene_003_city_dusk
+    prompt: >
+      Minimalist city skyline silhouette at dusk. 12 rectangular buildings of
+      varying heights. Gradient sky: deep orange at horizon fading to dark purple.
+      Ground fog layer. Static camera. 48 frames.

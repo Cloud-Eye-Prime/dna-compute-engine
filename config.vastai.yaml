@@ -1,0 +1,47 @@
+# DNA Compute Engine -- Vast.ai Configuration
+# Optimized for headless GPU rendering with Anthropic API
+active: anthropic
+
+providers:
+  anthropic:
+    api_key: "${ANTHROPIC_API_KEY}"
+    model: claude-sonnet-4-6-20250514
+    max_tokens: 4096
+    timeout: 90
+
+  ollama:
+    base_url: "http://localhost:11434"
+    model: "qwen2.5-coder:7b"
+    timeout: 120
+
+  lxr5:
+    base_url: "https://lxr-5-production.up.railway.app"
+    api_key: "${LXR5_API_KEY}"
+    timeout: 120
+
+blender:
+  executable: /usr/local/bin/blender
+  output_dir: /workspace/dna-compute-engine/renders
+  format: PNG
+  engine: CYCLES
+  resolution_x: 960
+  resolution_y: 540
+  fps: 24
+  samples: 64
+  gpu_script: /opt/blender/gpu_enable.py
+
+pipeline:
+  scenes_file: scenes.yaml
+  output_video: final.mp4
+  ffmpeg_crf: 18
+  keep_frames: true
+
+hardware:
+  ram_budget_mb: 48000
+  blender_ram_per_instance_mb: 4000
+
+physics:
+  default_type: geometry_nodes
+  default_variants: 4
+  default_frame_end: 48
+  bake_before_render: true

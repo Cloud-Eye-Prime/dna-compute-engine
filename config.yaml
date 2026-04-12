@@ -1,0 +1,64 @@
+# Blender LLM Pipeline — Provider Config
+active: ollama   # ollama | openai_compat | anthropic | lxr5 | hf
+
+providers:
+
+  ollama:
+    base_url: "http://localhost:11434"
+    model: "qwen2.5-coder:7b"
+    timeout: 120
+
+  openai_compat:
+    # Works with: LM Studio, llama.cpp server, OpenRouter, vLLM, TabbyAPI, Kobold
+    base_url: "http://localhost:1234"
+    api_key: "lm-studio"
+    model: "local-model"
+    timeout: 120
+
+  anthropic:
+    api_key: "${ANTHROPIC_API_KEY}"
+    model: "claude-sonnet-4-6-20250514"
+    max_tokens: 4096
+    timeout: 60
+
+  lxr5:
+    base_url: "https://lxr-5-production.up.railway.app"
+    api_key: "${LXR5_API_KEY}"
+    timeout: 120
+
+  hf:
+    api_key: "${HF_API_KEY}"
+    model: "Qwen/Qwen2.5-Coder-7B-Instruct"
+    base_url: "https://api-inference.huggingface.co/v1"
+    timeout: 120
+
+blender:
+  executable: "blender"
+  output_dir: "~/renders"
+  format: "PNG"
+  engine: "EEVEE"
+  resolution_x: 1280
+  resolution_y: 720
+  fps: 24
+  samples: 64
+
+pipeline:
+  scenes_file: "scenes.yaml"
+  output_video: "final.mp4"
+  ffmpeg_crf: 18
+  keep_frames: false
+
+# Hardware budget (controls parallel worker count)
+hardware:
+  ram_budget_mb: 6000          # RAM available for Blender instances (after OS + LLM)
+  blender_ram_per_instance_mb: 2000  # Estimated RAM per headless Blender process
+  # On S26 with 12GB:
+  #   Ollama 7B = ~4.5GB  -->  6GB left  -->  ~2-3 parallel workers (set above)
+  #   LXR-5 Dragon MoA = ~7GB active  -->  4GB left  -->  2 workers max
+
+# Physics simulation defaults
+physics:
+  default_type: rigid_body    # rigid_body | soft_body | cloth | fluid | particles | geometry_nodes
+  default_variants: 4
+  default_frame_end: 72
+  bake_before_render: true
