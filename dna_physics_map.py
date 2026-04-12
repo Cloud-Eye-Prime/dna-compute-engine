@@ -1,11 +1,11 @@
 """
-dna_physics_map.py — Maps real DNA biophysics constants to Blender physics parameters.
+dna_physics_map.py â€” Maps real DNA biophysics constants to Blender physics parameters.
 
 Grounded in actual molecular biology:
   - Persistence lengths (ssDNA ~1-3nm, dsDNA ~50nm)
   - Toehold-mediated strand displacement kinetics (k_on ~ 10^5-10^6 M-1 s-1)
   - Wallace / SantaLucia melting temperature formulas
-  - Diffusion coefficients (D = kT / 6πηr)
+  - Diffusion coefficients (D = kT / 6Ï€Î·r)
   - GC content effects on duplex stability
   - Salt concentration / Debye screening length
 
@@ -16,12 +16,12 @@ References:
 """
 import math
 
-# ── Physical constants ────────────────────────────────────────────────────────
+# â”€â”€ Physical constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 kB = 1.380649e-23   # Boltzmann constant (J/K)
-T_STANDARD = 310.15 # 37°C in Kelvin (physiological)
-ETA_WATER  = 0.001  # dynamic viscosity of water at 20°C (Pa·s)
+T_STANDARD = 310.15 # 37Â°C in Kelvin (physiological)
+ETA_WATER  = 0.001  # dynamic viscosity of water at 20Â°C (PaÂ·s)
 
-# ── Biophysics → Blender parameter mappings ───────────────────────────────────
+# â”€â”€ Biophysics â†’ Blender parameter mappings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def gc_content(sequence: str) -> float:
     """GC fraction of a DNA sequence (0.0 - 1.0)."""
@@ -31,7 +31,7 @@ def gc_content(sequence: str) -> float:
 
 def melting_temp_wallace(sequence: str) -> float:
     """
-    Wallace rule: Tm = 2*(A+T) + 4*(G+C)  [°C]
+    Wallace rule: Tm = 2*(A+T) + 4*(G+C)  [Â°C]
     Valid for short oligos < 14 nt in 50mM NaCl.
     """
     s = sequence.upper()
@@ -42,7 +42,7 @@ def melting_temp_wallace(sequence: str) -> float:
 def melting_temp_santalucia(gc: float, length: int, salt_mM: float = 50.0) -> float:
     """
     Simplified SantaLucia (1998) estimate for longer strands.
-    Tm (°C) = 81.5 + 16.6*log10([Na+]) + 0.41*GC% - 675/N
+    Tm (Â°C) = 81.5 + 16.6*log10([Na+]) + 0.41*GC% - 675/N
     """
     na_M = salt_mM / 1000.0
     return 81.5 + 16.6 * math.log10(na_M) + 41.0 * gc - 675.0 / max(length, 1)
@@ -59,7 +59,7 @@ def persistence_length(is_double_stranded: bool, gc: float = 0.5) -> float:
         return 0.75 + 2.25 * gc   # 0.75-3 nm
 
 def diffusion_coefficient(radius_nm: float, temp_C: float = 25.0) -> float:
-    """Stokes-Einstein: D = kT / (6πηr)  [m²/s]"""
+    """Stokes-Einstein: D = kT / (6Ï€Î·r)  [mÂ²/s]"""
     T = temp_C + 273.15
     r = radius_nm * 1e-9
     return (kB * T) / (6 * math.pi * ETA_WATER * r)
@@ -67,21 +67,21 @@ def diffusion_coefficient(radius_nm: float, temp_C: float = 25.0) -> float:
 def toehold_k_on(toehold_length: int, gc_toehold: float) -> float:
     """
     Approximate k_on for toehold binding (M^-1 s^-1).
-    Based on Zhang & Winfree (2009): k_on ≈ k_max * f(toehold_len)
+    Based on Zhang & Winfree (2009): k_on â‰ˆ k_max * f(toehold_len)
     GC-rich toeholds bind ~3-4 orders of magnitude faster than AT-rich.
     """
     k_max = 1e6    # upper limit ~10^6 M-1 s-1
-    # Saturation curve: longer toehold → faster, plateaus at ~10nt
+    # Saturation curve: longer toehold â†’ faster, plateaus at ~10nt
     length_factor = 1.0 - math.exp(-toehold_length / 5.0)
     gc_factor = 0.1 + 0.9 * gc_toehold  # AT-rich = 0.1x, GC-rich = 1.0x
     return k_max * length_factor * gc_factor
 
 def debye_length(salt_mM: float) -> float:
-    """Debye screening length κ^-1 (nm) — electrostatic range."""
+    """Debye screening length Îº^-1 (nm) â€” electrostatic range."""
     return 0.304 / math.sqrt(salt_mM / 1000.0)
 
 
-# ── Blender parameter translators ─────────────────────────────────────────────
+# â”€â”€ Blender parameter translators â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class DNAtoBlender:
     """
@@ -90,7 +90,8 @@ class DNAtoBlender:
     """
     def __init__(self, sequence: str = "ATCGATCG", toehold_len: int = 6,
                  salt_mM: float = 150.0, temp_C: float = 37.0,
-                 is_dsDNA: bool = False, strand_nM: float = 100.0):
+                 is_dsDNA: bool = False, strand_nM: float = 100.0,
+                 gc_toehold: float = None):
         self.seq       = sequence.upper()
         self.gc        = gc_content(sequence)
         self.toehold   = toehold_len
@@ -102,13 +103,13 @@ class DNAtoBlender:
         self.Tm     = melting_temp_wallace(sequence) if len(sequence) < 14                       else melting_temp_santalucia(self.gc, len(sequence), salt_mM)
         self.Lp     = persistence_length(is_dsDNA, self.gc)
         self.D      = diffusion_coefficient(0.5 + 0.02 * len(sequence), temp_C)
-        self.k_on   = toehold_k_on(toehold_len, self.gc)
+        self.k_on   = toehold_k_on(toehold_len, gc_toehold if gc_toehold is not None else self.gc)
         self.kappa  = debye_length(salt_mM)
 
     def soft_body_params(self) -> dict:
         """Soft body settings for DNA strand flexibility."""
         # Stiffness: ssDNA flexible, dsDNA rigid
-        stiff = 0.05 + 0.75 * (self.Lp / 55.0)   # 0.05 (ssDNA) → 0.8 (dsDNA)
+        stiff = 0.05 + 0.75 * (self.Lp / 55.0)   # 0.05 (ssDNA) â†’ 0.8 (dsDNA)
         # Damping scales with solvent viscosity + salt
         damp = 0.1 + 0.4 * (self.salt_mM / 1000.0)
         # Thermal motion: higher temp = more brownian = lower goal weight
@@ -123,7 +124,7 @@ class DNAtoBlender:
 
     def particle_params(self) -> dict:
         """Particle system for nucleotide/strand diffusion."""
-        # Count scales with strand concentration (nM → particle density proxy)
+        # Count scales with strand concentration (nM â†’ particle density proxy)
         count = max(50, min(5000, int(self.strand_nM * 20)))
         # Lifetime: stable duplexes live longer
         stability = self.Tm / 80.0   # normalize to ~0-1
@@ -149,7 +150,7 @@ class DNAtoBlender:
             "force_scale":         round(self.k_on / 1e6, 4),
             "damping":             round(0.1 + 0.5 * (self.salt_mM / 500.0), 3),
             "stiffness":           round(self.soft_body_params()["goal_stiffness"], 3),
-            "collision_radius":    round(self.kappa / 10.0, 4),   # nm → blender units
+            "collision_radius":    round(self.kappa / 10.0, 4),   # nm â†’ blender units
             "noise_scale":         round(1.0 / (self.Lp + 1.0), 3),
         }
 
