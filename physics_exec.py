@@ -50,6 +50,22 @@ try:
 
     ns = {"bpy": bpy, "__file__": code_path}
     exec(compile(code, code_path, "exec"), ns)
+
+    # Safety: ensure frames were rendered. If not, force a render.
+    output_path = bpy.context.scene.render.filepath
+    if output_path and not any(pathlib.Path(output_path).parent.glob("*.png")):
+        print(f"[physics_exec] No frames found after exec -- forcing render")
+        bpy.context.scene.render.image_settings.file_format = "PNG"
+        try:
+            bpy.ops.render.render(animation=True)
+        except Exception as re:
+            print(f"[physics_exec] Safety render failed: {re}")
+            # Try single frame as last resort
+            try:
+                bpy.ops.render.render(write_still=True)
+            except Exception:
+                pass
+
     print(f"[physics_exec] SUCCESS: {pathlib.Path(code_path).stem}")
 except Exception as e:
     print(f"[physics_exec] FAILED: {e}")
