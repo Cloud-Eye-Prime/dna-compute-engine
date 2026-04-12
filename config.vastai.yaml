@@ -7,7 +7,7 @@ providers:
     api_key: "${ANTHROPIC_API_KEY}"
     model: claude-sonnet-4-6
     max_tokens: 16384
-    timeout: 90
+    timeout: 300
 
   ollama:
     base_url: "http://localhost:11434"
