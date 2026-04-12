@@ -107,10 +107,38 @@ class PhysicsMatrix:
             f"or explore physical extremes (stiff/soft, heavy/light, etc.)\n"
             f"frame_end = {frame_end}"
         )
+        # Set the matrix-specific system prompt
+        import llm_bridge as _lb
+        _old_sp = _lb.SYSTEM_PROMPT
+        _lb.SYSTEM_PROMPT = MATRIX_SYSTEM_PROMPT + "\n\n" + _lb.SYSTEM_PROMPT
+        
         raw = self.bridge.ask(user_prompt, model=model)
+        _lb.SYSTEM_PROMPT = _old_sp  # restore
+        
         raw = re.sub(r"^```[\w]*\n?", "", raw, flags=re.MULTILINE)
         raw = re.sub(r"```\s*$", "", raw, flags=re.MULTILINE)
-        data = json.loads(raw.strip())
+        
+        # Retry logic for JSON parse failures
+        for attempt in range(3):
+            try:
+                data = json.loads(raw.strip())
+                break
+            except json.JSONDecodeError as e:
+                if attempt < 2:
+                    print(f"[matrix] JSON parse failed (attempt {attempt+1}): {e}")
+                    print(f"[matrix] Retrying with completion request...")
+                    retry_prompt = (
+                        "Your previous response was truncated or had invalid JSON. "
+                        "The error was: " + str(e) + "\n"
+                        "Please regenerate the COMPLETE JSON response. "
+                        "Output ONLY valid JSON, no markdown."
+                    )
+                    raw = self.bridge.ask(retry_prompt, model=model)
+                    raw = re.sub(r"^```[\w]*\n?", "", raw, flags=re.MULTILINE)
+                    raw = re.sub(r"```\s*$", "", raw, flags=re.MULTILINE)
+                else:
+                    print(f"[matrix] JSON parse failed after 3 attempts: {e}")
+                    raise
         return MatrixResult(data, description, frame_end)
 
 class MatrixResult:
