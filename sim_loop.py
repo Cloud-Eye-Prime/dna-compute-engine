@@ -204,6 +204,7 @@ def main():
     p.add_argument("--cascade",  default=None)
     p.add_argument("--max-iter", type=int, default=3)
     p.add_argument("--workers",  type=int, default=2)
+    p.add_argument("--frame-end", type=int, default=24)
     p.add_argument("--variants", type=int, default=4)
     p.add_argument("--config",   default="config.yaml")
     p.add_argument("--provider", default=None)
@@ -234,6 +235,7 @@ def main():
         workers=args.workers,
         goal_type=args.goal,
         n_variants=args.variants,
+        frame_end=args.frame_end,
         dry_run=args.dry_run,
     )
     print("\nFinal signals: " + json.dumps(signals, indent=2))
