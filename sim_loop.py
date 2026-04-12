@@ -151,8 +151,14 @@ class SimLoop:
             signals = {}
             if not dry_run and report_path.exists():
                 signals = extract_readout_pixels(report_path) if HAS_PIL else {}
+                # Fall back to LLM readout if pixel signals show no variation
                 if not signals:
                     signals = extract_readout_llm(self.bridge, report_path)
+                elif len(set(round(v, 3) for v in signals.values())) <= 1:
+                    print("[readout] Pixel signals identical -- falling back to LLM readout")
+                    llm_signals = extract_readout_llm(self.bridge, report_path)
+                    if llm_signals:
+                        signals = llm_signals
             if dry_run:
                 import random; random.seed(i * 37)
                 signals = {"v" + str(j+1).zfill(3): round(random.uniform(0.1, 0.9), 3)
