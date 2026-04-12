@@ -1,4 +1,4 @@
-# Blender LLM Pipeline — Provider Config
+# Blender LLM Pipeline â€” Provider Config
 active: ollama   # ollama | openai_compat | anthropic | lxr5 | hf
 
 providers:
@@ -17,7 +17,7 @@ providers:
 
   anthropic:
     api_key: "${ANTHROPIC_API_KEY}"
-    model: "claude-sonnet-4-6-20250514"
+    model: "claude-sonnet-4-6"
     max_tokens: 4096
     timeout: 60
 
