@@ -136,8 +136,10 @@ class SimLoop:
             if dry_run:
                 cmd.append("--dry-run")
             res = subprocess.run(cmd, capture_output=True, text=True)
+            if res.stderr:
+                print("[sim_loop] STDERR:", res.stderr[-1000:])
             if res.stdout:
-                print(res.stdout[-800:])
+                print(res.stdout[-2000:])
 
             # Copy outputs to iter dir
             src_dir = pathlib.Path(self.cfg["blender"]["output_dir"]).expanduser() / "physics_matrix"
