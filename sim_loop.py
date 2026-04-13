@@ -143,9 +143,9 @@ class SimLoop:
         self.history     = []
 
         if backend == "icrn" and not HAS_ICRN:
-            print("[FATAL] ICRN backend requested but icrn_bridge not available.")
+            print("[WARN] ICRN backend requested but icrn_bridge not available.")
             print("  Install: pip install git+https://github.com/SwissChardLeaf/icrn.git")
-            sys.exit(1)
+            print("  Dry-run mode will still work. Live simulation will fail.")
 
     def _run_icrn_variants(self, gate_type, n_variants, iter_num,
                            time=100.0, sample_num=50, **gate_kwargs):
@@ -302,8 +302,10 @@ class SimLoop:
                 best_signals = signals
                 break
 
-            # LLM refinement
-            if i < max_iter - 1:
+            # LLM refinement (skip in dry-run: no LLM available)
+            if dry_run:
+                print("[refine] dry-run: skipping LLM refinement")
+            elif i < max_iter - 1:
                 import llm_bridge as lb
                 old_sp = lb.SYSTEM_PROMPT
                 if self.backend == "icrn":
