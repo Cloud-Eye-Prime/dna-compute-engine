@@ -39,6 +39,17 @@ fi
 # --- Python packages ---
 echo "[3/7] Installing Python dependencies..."
 pip3 install -q numpy Pillow PyYAML requests anthropic > /dev/null 2>&1
+echo "    Core packages done."
+
+# --- JAX + ICRN (differentiable CRN simulator) ---
+echo "[3b/7] Installing JAX (CUDA) + ICRN..."
+pip3 install -q jax[cuda12] jaxlib optax > /dev/null 2>&1
+pip3 install -q git+https://github.com/SwissChardLeaf/icrn.git > /dev/null 2>&1
+echo "    JAX + ICRN done."
+echo -n "    JAX CUDA: "
+python3 -c "import jax; print(jax.devices())" 2>/dev/null || echo "FAILED (CPU fallback available)"
+echo -n "    ICRN: "
+python3 -c "import icrn; print('v0.1.0 OK')" 2>/dev/null || echo "FAILED"
 echo "    Done."
 
 # --- GPU CUDA enablement script for Blender ---
@@ -140,6 +151,7 @@ echo ""
 echo "Next steps:"
 echo "  1. Clone repo: git clone https://github.com/Cloud-Eye-Prime/dna-compute-engine.git $WORKSPACE"
 echo "  2. Set API key: export ANTHROPIC_API_KEY=sk-ant-..."
-echo "  3. Dry run:     cd $WORKSPACE && python3 dna_compute.py --sequence GCGCATCGATGCGC --dry-run"
-echo "  4. Render:      python3 dna_compute.py --sequence GCGCATCGATGCGC --variants 4 --workers 2"
+echo "  3. ICRN test:   cd $WORKSPACE && python3 icrn_bridge.py"
+echo "  4. Gate 2 ICRN: python3 sim_loop.py --backend icrn --gate AND --goal AND_gate --max-iter 3 --config config.vastai.yaml"
+echo "  5. Blender viz: python3 dna_compute.py --sequence GCGCATCGATGCGC --variants 4 --workers 2"
 echo "============================================"
